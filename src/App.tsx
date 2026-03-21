@@ -10,6 +10,7 @@ import SmsAnalyzerPage from "./pages/SmsAnalyzerPage";
 import ReportsPage from "./pages/ReportsPage";
 import AboutPage from "./pages/AboutPage";
 import CallSimulatorPage from "./pages/CallSimulatorPage";
+import LoginPage from "./pages/LoginPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
