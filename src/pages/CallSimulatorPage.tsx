@@ -46,6 +46,7 @@ export default function CallSimulatorPage() {
   const [blockedNumbers, setBlockedNumbers] = useState<string[]>([]);
   const [callDuration, setCallDuration] = useState(0);
   const [intervalId, setIntervalId] = useState<ReturnType<typeof setInterval> | null>(null);
+  const [speakingIndex, setSpeakingIndex] = useState(-1);
 
   const isBlocked = blockedNumbers.includes(number.trim());
 
