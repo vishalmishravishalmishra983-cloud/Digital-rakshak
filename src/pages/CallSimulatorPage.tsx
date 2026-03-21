@@ -17,23 +17,26 @@ const fraudAnnouncements = [
   { lang: "kn-IN", label: "ಕನ್ನಡ", text: "ಎಚ್ಚರಿಕೆ! ಇದು ವಂಚನೆ ಸಂಖ್ಯೆ. ಕರೆ ಸ್ವಯಂ ನಿರ್ಬಂಧಿಸಲಾಗಿದೆ." },
 ];
 
+function detectUserLanguage(): number {
+  const browserLang = navigator.language || (navigator as any).userLanguage || "en-US";
+  const langPrefix = browserLang.toLowerCase().split("-")[0];
+  const idx = fraudAnnouncements.findIndex((a) => a.lang.toLowerCase().startsWith(langPrefix));
+  return idx >= 0 ? idx : 1; // default to English
+}
+
 function speakFraudWarning(onSpeaking?: (index: number) => void) {
   if (!("speechSynthesis" in window)) return;
   window.speechSynthesis.cancel();
-  let index = 0;
-  const speakNext = () => {
-    if (index >= fraudAnnouncements.length) { onSpeaking?.(-1); return; }
-    onSpeaking?.(index);
-    const { lang, text } = fraudAnnouncements[index];
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = lang;
-    utterance.rate = 0.95;
-    utterance.pitch = 1.1;
-    utterance.onend = () => { index++; speakNext(); };
-    utterance.onerror = () => { index++; speakNext(); };
-    window.speechSynthesis.speak(utterance);
-  };
-  speakNext();
+  const idx = detectUserLanguage();
+  onSpeaking?.(idx);
+  const { lang, text } = fraudAnnouncements[idx];
+  const utterance = new SpeechSynthesisUtterance(text);
+  utterance.lang = lang;
+  utterance.rate = 0.95;
+  utterance.pitch = 1.1;
+  utterance.onend = () => onSpeaking?.(-1);
+  utterance.onerror = () => onSpeaking?.(-1);
+  window.speechSynthesis.speak(utterance);
 }
 
 type CallState = "idle" | "dialing" | "ringing" | "connected" | "ended";
