@@ -18,6 +18,11 @@ const fraudAnnouncements = [
 ];
 
 function detectUserLanguage(): number {
+  const savedLang = localStorage.getItem("ss_language");
+  if (savedLang) {
+    const idx = fraudAnnouncements.findIndex((a) => a.lang === savedLang);
+    if (idx >= 0) return idx;
+  }
   const browserLang = navigator.language || (navigator as any).userLanguage || "en-US";
   const langPrefix = browserLang.toLowerCase().split("-")[0];
   const idx = fraudAnnouncements.findIndex((a) => a.lang.toLowerCase().startsWith(langPrefix));
