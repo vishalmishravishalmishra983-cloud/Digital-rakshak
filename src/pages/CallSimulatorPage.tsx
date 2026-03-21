@@ -1,10 +1,40 @@
 import { useState, useCallback } from "react";
-import { Phone, PhoneOff, ShieldX, ShieldCheck, AlertTriangle, Ban, PhoneCall } from "lucide-react";
+import { Phone, PhoneOff, ShieldX, ShieldCheck, AlertTriangle, Ban, PhoneCall, Volume2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { spamNumbers } from "@/lib/spamData";
 import { toast } from "@/components/ui/sonner";
+
+const fraudAnnouncements = [
+  { lang: "hi-IN", label: "हिंदी", text: "चेतावनी! यह एक फ्रॉड नंबर है। कॉल ऑटो ब्लॉक कर दिया गया है।" },
+  { lang: "en-US", label: "English", text: "Warning! This is a fraud number. The call has been auto-blocked." },
+  { lang: "bn-IN", label: "বাংলা", text: "সতর্কতা! এটি একটি প্রতারণামূলক নম্বর। কলটি স্বয়ংক্রিয়ভাবে ব্লক করা হয়েছে।" },
+  { lang: "ta-IN", label: "தமிழ்", text: "எச்சரிக்கை! இது ஒரு மோசடி எண். அழைப்பு தானாக தடுக்கப்பட்டது." },
+  { lang: "te-IN", label: "తెలుగు", text: "హెచ్చరిక! ఇది ఒక మోసపూరిత నంబర్. కాల్ ఆటో బ్లాక్ చేయబడింది." },
+  { lang: "mr-IN", label: "मराठी", text: "सावधान! हा एक फसवणूक नंबर आहे. कॉल ऑटो ब्लॉक झाला आहे." },
+  { lang: "gu-IN", label: "ગુજરાતી", text: "ચેતવણી! આ એક છેતરપિંડી નંબર છે. કૉલ ઑટો બ્લૉક થઈ ગયો છે." },
+  { lang: "kn-IN", label: "ಕನ್ನಡ", text: "ಎಚ್ಚರಿಕೆ! ಇದು ವಂಚನೆ ಸಂಖ್ಯೆ. ಕರೆ ಸ್ವಯಂ ನಿರ್ಬಂಧಿಸಲಾಗಿದೆ." },
+];
+
+function speakFraudWarning(onSpeaking?: (index: number) => void) {
+  if (!("speechSynthesis" in window)) return;
+  window.speechSynthesis.cancel();
+  let index = 0;
+  const speakNext = () => {
+    if (index >= fraudAnnouncements.length) { onSpeaking?.(-1); return; }
+    onSpeaking?.(index);
+    const { lang, text } = fraudAnnouncements[index];
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = lang;
+    utterance.rate = 0.95;
+    utterance.pitch = 1.1;
+    utterance.onend = () => { index++; speakNext(); };
+    utterance.onerror = () => { index++; speakNext(); };
+    window.speechSynthesis.speak(utterance);
+  };
+  speakNext();
+}
 
 type CallState = "idle" | "dialing" | "ringing" | "connected" | "ended";
 type NumberStatus = "spam" | "suspicious" | "safe" | null;
@@ -16,6 +46,7 @@ export default function CallSimulatorPage() {
   const [blockedNumbers, setBlockedNumbers] = useState<string[]>([]);
   const [callDuration, setCallDuration] = useState(0);
   const [intervalId, setIntervalId] = useState<ReturnType<typeof setInterval> | null>(null);
+  const [speakingIndex, setSpeakingIndex] = useState(-1);
 
   const isBlocked = blockedNumbers.includes(number.trim());
 
@@ -41,6 +72,7 @@ export default function CallSimulatorPage() {
           description: `${trimmed} एक ${found?.type || "Spam"} number है। Call auto-block हो गया।`,
         });
         setBlockedNumbers((prev) => (prev.includes(trimmed) ? prev : [...prev, trimmed]));
+        speakFraudWarning((idx) => setSpeakingIndex(idx));
       } else {
         setCallState("ringing");
         setTimeout(() => {
@@ -160,6 +192,44 @@ export default function CallSimulatorPage() {
                     {numberStatus === "spam" ? "🚫 Call Auto-Blocked!" : "📞 Call Ended"}
                   </h3>
                   {callDuration > 0 && <p className="text-center text-sm text-muted-foreground mt-1">Duration: {formatDuration(callDuration)}</p>}
+                  
+                  {/* Multilingual AI Announcement */}
+                  {numberStatus === "spam" && (
+                    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="mt-4">
+                      <div className="flex items-center justify-center gap-2 mb-3">
+                        <Volume2 className="h-4 w-4 text-destructive animate-pulse" />
+                        <span className="text-sm font-semibold text-destructive">🔊 AI Voice Alert – सभी भाषाओं में</span>
+                      </div>
+                      <div className="space-y-1.5 max-h-48 overflow-y-auto">
+                        {fraudAnnouncements.map((a, i) => (
+                          <motion.div
+                            key={a.lang}
+                            initial={{ opacity: 0, x: -10 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ delay: i * 0.1 }}
+                            className={`flex items-start gap-2 rounded-md border p-2 text-xs transition-colors ${
+                              speakingIndex === i
+                                ? "border-destructive bg-destructive/20 ring-1 ring-destructive"
+                                : "border-border bg-secondary/50"
+                            }`}
+                          >
+                            <span className="font-bold text-muted-foreground shrink-0 w-16">{a.label}</span>
+                            <span className="text-foreground">{a.text}</span>
+                            {speakingIndex === i && <Volume2 className="h-3 w-3 text-destructive animate-pulse shrink-0 mt-0.5" />}
+                          </motion.div>
+                        ))}
+                      </div>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="mt-3 w-full text-xs"
+                        onClick={() => speakFraudWarning((idx) => setSpeakingIndex(idx))}
+                      >
+                        <Volume2 className="h-3 w-3 mr-1" /> फिर से सुनें / Replay Alert
+                      </Button>
+                    </motion.div>
+                  )}
+
                   {numberStatus !== "spam" && !blockedNumbers.includes(number.trim()) && (
                     <div className="text-center mt-3">
                       <Button size="sm" variant="destructive" onClick={handleBlockNumber}>
