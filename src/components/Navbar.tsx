@@ -11,6 +11,7 @@ const navItems = [
   { path: "/call-simulator", label: "Call & Block" },
   { path: "/reports", label: "Reports" },
   { path: "/about", label: "About" },
+  { path: "/login", label: "Login" },
 ];
 
 export default function Navbar() {
