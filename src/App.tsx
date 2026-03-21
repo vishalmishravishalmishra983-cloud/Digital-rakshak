@@ -9,6 +9,7 @@ import NumberCheckerPage from "./pages/NumberCheckerPage";
 import SmsAnalyzerPage from "./pages/SmsAnalyzerPage";
 import ReportsPage from "./pages/ReportsPage";
 import AboutPage from "./pages/AboutPage";
+import CallSimulatorPage from "./pages/CallSimulatorPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -25,6 +26,7 @@ const App = () => (
           <Route path="/number-checker" element={<NumberCheckerPage />} />
           <Route path="/sms-analyzer" element={<SmsAnalyzerPage />} />
           <Route path="/reports" element={<ReportsPage />} />
+          <Route path="/call-simulator" element={<CallSimulatorPage />} />
           <Route path="/about" element={<AboutPage />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
