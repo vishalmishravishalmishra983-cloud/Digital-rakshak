@@ -72,6 +72,7 @@ export default function CallSimulatorPage() {
           description: `${trimmed} एक ${found?.type || "Spam"} number है। Call auto-block हो गया।`,
         });
         setBlockedNumbers((prev) => (prev.includes(trimmed) ? prev : [...prev, trimmed]));
+        speakFraudWarning((idx) => setSpeakingIndex(idx));
       } else {
         setCallState("ringing");
         setTimeout(() => {
