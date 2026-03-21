@@ -192,6 +192,44 @@ export default function CallSimulatorPage() {
                     {numberStatus === "spam" ? "🚫 Call Auto-Blocked!" : "📞 Call Ended"}
                   </h3>
                   {callDuration > 0 && <p className="text-center text-sm text-muted-foreground mt-1">Duration: {formatDuration(callDuration)}</p>}
+                  
+                  {/* Multilingual AI Announcement */}
+                  {numberStatus === "spam" && (
+                    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="mt-4">
+                      <div className="flex items-center justify-center gap-2 mb-3">
+                        <Volume2 className="h-4 w-4 text-destructive animate-pulse" />
+                        <span className="text-sm font-semibold text-destructive">🔊 AI Voice Alert – सभी भाषाओं में</span>
+                      </div>
+                      <div className="space-y-1.5 max-h-48 overflow-y-auto">
+                        {fraudAnnouncements.map((a, i) => (
+                          <motion.div
+                            key={a.lang}
+                            initial={{ opacity: 0, x: -10 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ delay: i * 0.1 }}
+                            className={`flex items-start gap-2 rounded-md border p-2 text-xs transition-colors ${
+                              speakingIndex === i
+                                ? "border-destructive bg-destructive/20 ring-1 ring-destructive"
+                                : "border-border bg-secondary/50"
+                            }`}
+                          >
+                            <span className="font-bold text-muted-foreground shrink-0 w-16">{a.label}</span>
+                            <span className="text-foreground">{a.text}</span>
+                            {speakingIndex === i && <Volume2 className="h-3 w-3 text-destructive animate-pulse shrink-0 mt-0.5" />}
+                          </motion.div>
+                        ))}
+                      </div>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="mt-3 w-full text-xs"
+                        onClick={() => speakFraudWarning((idx) => setSpeakingIndex(idx))}
+                      >
+                        <Volume2 className="h-3 w-3 mr-1" /> फिर से सुनें / Replay Alert
+                      </Button>
+                    </motion.div>
+                  )}
+
                   {numberStatus !== "spam" && !blockedNumbers.includes(number.trim()) && (
                     <div className="text-center mt-3">
                       <Button size="sm" variant="destructive" onClick={handleBlockNumber}>
