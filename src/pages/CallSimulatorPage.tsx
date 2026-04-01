@@ -44,7 +44,7 @@ function speakFraudWarning(onSpeaking?: (index: number) => void) {
   window.speechSynthesis.speak(utterance);
 }
 
-type CallState = "idle" | "dialing" | "ringing" | "connected" | "ended";
+type CallState = "idle" | "dialing" | "ringing" | "connected" | "ended" | "blocked";
 type NumberStatus = "spam" | "suspicious" | "safe" | null;
 
 export default function CallSimulatorPage() {
@@ -55,28 +55,28 @@ export default function CallSimulatorPage() {
   const [callDuration, setCallDuration] = useState(0);
   const [speakingIndex, setSpeakingIndex] = useState(-1);
 
-  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const dialTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const ringTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const cancelledRef = useRef(false);
+  const timersRef = useRef<number[]>([]);
 
-  const isBlocked = blockedNumbers.includes(number.trim());
+  const clearTimers = useCallback(() => {
+    timersRef.current.forEach((id) => {
+      clearTimeout(id);
+      clearInterval(id);
+    });
+    timersRef.current = [];
+  }, []);
+
+  const addTimer = (id: number) => {
+    timersRef.current.push(id);
+  };
 
   useEffect(() => {
     return () => {
-      if (timerRef.current) clearInterval(timerRef.current);
-      if (dialTimeoutRef.current) clearTimeout(dialTimeoutRef.current);
-      if (ringTimeoutRef.current) clearTimeout(ringTimeoutRef.current);
+      clearTimers();
       window.speechSynthesis?.cancel();
     };
-  }, []);
+  }, [clearTimers]);
 
-  const clearAllTimers = useCallback(() => {
-    if (timerRef.current) { clearInterval(timerRef.current); timerRef.current = null; }
-    if (dialTimeoutRef.current) { clearTimeout(dialTimeoutRef.current); dialTimeoutRef.current = null; }
-    if (ringTimeoutRef.current) { clearTimeout(ringTimeoutRef.current); ringTimeoutRef.current = null; }
-    cancelledRef.current = true;
-  }, []);
+  const isBlocked = blockedNumbers.includes(number.trim());
 
   const handleCall = useCallback(() => {
     const trimmed = number.trim();
@@ -85,13 +85,16 @@ export default function CallSimulatorPage() {
       return;
     }
 
+    clearTimers();
+    window.speechSynthesis?.cancel();
+    setSpeakingIndex(-1);
+
     if (blockedNumbers.includes(trimmed)) {
+      setCallState("blocked");
+      setNumberStatus(null);
       toast("🚫 यह नंबर Block है!", { description: `${trimmed} को आपने block किया है।` });
       return;
     }
-
-    clearAllTimers();
-    cancelledRef.current = false;
 
     const found = spamNumbers[trimmed];
     const status: NumberStatus = found?.status ?? "safe";
@@ -99,31 +102,28 @@ export default function CallSimulatorPage() {
     setCallState("dialing");
     setCallDuration(0);
 
-    dialTimeoutRef.current = setTimeout(() => {
-      if (cancelledRef.current) return;
-
+    addTimer(window.setTimeout(() => {
       if (status === "spam") {
         setCallState("ended");
+        setBlockedNumbers((prev) => (prev.includes(trimmed) ? prev : [...prev, trimmed]));
         toast("⚠️ Fraud Number Detected!", {
           description: `${trimmed} एक ${found?.type || "Spam"} number है। Call auto-block हो गया।`,
         });
-        setBlockedNumbers((prev) => (prev.includes(trimmed) ? prev : [...prev, trimmed]));
         speakFraudWarning((idx) => setSpeakingIndex(idx));
       } else {
         setCallState("ringing");
-        ringTimeoutRef.current = setTimeout(() => {
-          if (cancelledRef.current) return;
+        addTimer(window.setTimeout(() => {
           setCallState("connected");
-          timerRef.current = setInterval(() => setCallDuration((d) => d + 1), 1000);
-        }, 1500);
+          addTimer(window.setInterval(() => setCallDuration((d) => d + 1), 1000));
+        }, 1500));
       }
-    }, 2000);
-  }, [number, blockedNumbers, clearAllTimers]);
+    }, 2000));
+  }, [number, blockedNumbers, clearTimers]);
 
   const handleEndCall = useCallback(() => {
-    clearAllTimers();
+    clearTimers();
     setCallState("ended");
-  }, [clearAllTimers]);
+  }, [clearTimers]);
 
   const handleBlockNumber = useCallback(() => {
     const trimmed = number.trim();
@@ -139,17 +139,14 @@ export default function CallSimulatorPage() {
     toast("✅ Number Unblocked", { description: `${num} को unblock कर दिया गया।` });
   }, []);
 
-  const resetAndCall = useCallback(() => {
-    clearAllTimers();
-    cancelledRef.current = false;
+  const handleNewCall = useCallback(() => {
+    clearTimers();
+    window.speechSynthesis?.cancel();
+    setSpeakingIndex(-1);
     setCallState("idle");
     setNumberStatus(null);
     setCallDuration(0);
-    setSpeakingIndex(-1);
-    window.speechSynthesis?.cancel();
-    // Use setTimeout to let state reset before calling
-    setTimeout(() => handleCall(), 10);
-  }, [clearAllTimers, handleCall]);
+  }, [clearTimers]);
 
   const formatDuration = (s: number) =>
     `${Math.floor(s / 60).toString().padStart(2, "0")}:${(s % 60).toString().padStart(2, "0")}`;
@@ -159,6 +156,8 @@ export default function CallSimulatorPage() {
     suspicious: { icon: AlertTriangle, label: "⚠️ Suspicious Number", bg: "bg-warning/20 border-warning" },
     safe: { icon: ShieldCheck, label: "✅ Safe Number", bg: "bg-cyber-green/20 border-cyber-green" },
   };
+
+  const canInteract = callState === "idle" || callState === "ended" || callState === "blocked";
 
   return (
     <div className="min-h-screen pt-20 pb-12">
@@ -174,19 +173,17 @@ export default function CallSimulatorPage() {
                 value={number}
                 onChange={(e) => setNumber(e.target.value)}
                 onKeyDown={(e) => {
-                  if (e.key === "Enter" && (callState === "idle" || callState === "ended")) {
-                    resetAndCall();
-                  }
+                  if (e.key === "Enter" && canInteract) handleCall();
                 }}
                 className="bg-secondary border-border text-foreground font-mono"
-                disabled={callState === "dialing" || callState === "ringing" || callState === "connected"}
+                disabled={!canInteract}
               />
             </div>
 
             <div className="flex gap-3">
-              {callState === "idle" || callState === "ended" ? (
+              {canInteract ? (
                 <>
-                  <Button onClick={resetAndCall} className="bg-cyber-green text-background hover:bg-cyber-green/90 flex-1">
+                  <Button onClick={handleCall} className="bg-cyber-green text-background hover:bg-cyber-green/90 flex-1">
                     <PhoneCall className="h-4 w-4 mr-2" /> Call करें
                   </Button>
                   <Button onClick={handleBlockNumber} variant="destructive" disabled={!number.trim() || isBlocked}>
@@ -213,6 +210,18 @@ export default function CallSimulatorPage() {
                 <motion.div key="ringing" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="mt-6 text-center">
                   <Phone className="h-12 w-12 text-cyber-green mx-auto animate-bounce" />
                   <p className="text-foreground mt-2 font-semibold">📱 Ringing...</p>
+                </motion.div>
+              )}
+
+              {callState === "blocked" && (
+                <motion.div key="blocked" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                  className="mt-6 rounded-lg border p-6 bg-destructive/20 border-destructive text-center">
+                  <Ban className="h-10 w-10 mx-auto mb-2 text-destructive" />
+                  <h3 className="text-lg font-bold">🚫 Number Blocked!</h3>
+                  <p className="text-sm text-muted-foreground mt-1">{number.trim()} पहले से block है।</p>
+                  <Button size="sm" variant="outline" className="mt-3" onClick={handleNewCall}>
+                    नया नंबर डालें
+                  </Button>
                 </motion.div>
               )}
 
