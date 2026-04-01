@@ -24,7 +24,7 @@ export default function Navbar() {
         <Link to="/" className="flex items-center gap-2">
           <Shield className="h-7 w-7 text-primary" />
           <span className="text-lg font-bold text-foreground">
-            Spam<span className="text-primary">Shield</span> AI
+            Digital <span className="text-primary">Rakshak</span>
           </span>
         </Link>
 

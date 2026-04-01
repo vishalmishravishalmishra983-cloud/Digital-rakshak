@@ -23,9 +23,8 @@ export default function HomePage() {
               <Zap className="h-4 w-4" /> AI-Powered Cyber Security
             </div>
             <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight">
-              <span className="text-foreground">Spam</span>
-              <span className="text-primary glow-text">Shield</span>
-              <span className="text-foreground"> AI</span>
+              <span className="text-foreground">Digital </span>
+              <span className="text-primary glow-text">Rakshak</span>
             </h1>
             <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-4">
               Smart Cyber Security System
