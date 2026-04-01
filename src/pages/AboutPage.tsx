@@ -21,7 +21,7 @@ export default function AboutPage() {
       <div className="container mx-auto px-4 max-w-4xl">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
           <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-2">🔍 How It Works</h1>
-          <p className="text-muted-foreground mb-12">SpamShield AI कैसे काम करता है – पूरा flow समझें</p>
+          <p className="text-muted-foreground mb-12">Digital Rakshak कैसे काम करता है – पूरा flow समझें</p>
 
           {/* Working Flow */}
           <section className="mb-16">
