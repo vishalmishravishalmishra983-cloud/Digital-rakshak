@@ -39,7 +39,7 @@ export default function HomePage() {
                 </Link>
               </Button>
               <Button asChild variant="outline" size="lg" className="border-border text-foreground hover:bg-secondary">
-                <Link to="/about">कैसे काम करता है?</Link>
+                <Link to="/about">How It Works?</Link>
               </Button>
             </div>
           </motion.div>
