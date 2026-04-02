@@ -78,9 +78,9 @@ export default function HomePage() {
       <section className="py-20 border-t border-border">
         <div className="container mx-auto px-4 text-center">
           <Lock className="h-10 w-10 text-primary mx-auto mb-4" />
-          <h2 className="text-2xl font-bold text-foreground mb-3">आपका Data सुरक्षित है</h2>
+          <h2 className="text-2xl font-bold text-foreground mb-3">Your Data is Secure</h2>
           <p className="text-muted-foreground max-w-md mx-auto">
-            सभी analysis local device पर होता है। कोई personal data cloud पर नहीं जाता।
+            All analysis runs locally on your device. No personal data is sent to the cloud.
           </p>
         </div>
       </section>
