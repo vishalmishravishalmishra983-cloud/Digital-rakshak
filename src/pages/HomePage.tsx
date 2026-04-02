@@ -4,10 +4,10 @@ import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 
 const features = [
-  { icon: Phone, title: "Number Checker", desc: "किसी भी नंबर को चेक करें – Spam है या Safe", link: "/number-checker" },
-  { icon: MessageSquare, title: "SMS Analyzer", desc: "SMS को AI से analyze करें और fraud detect करें", link: "/sms-analyzer" },
-  { icon: BarChart3, title: "Dashboard", desc: "Real-time stats और threats देखें", link: "/dashboard" },
-  { icon: Users, title: "Community Reports", desc: "लोगों द्वारा report किए गए spam numbers", link: "/reports" },
+  { icon: Phone, title: "Number Checker", desc: "Check any number instantly – Spam or Safe", link: "/number-checker" },
+  { icon: MessageSquare, title: "SMS Analyzer", desc: "Analyze SMS with AI and detect fraud messages", link: "/sms-analyzer" },
+  { icon: BarChart3, title: "Dashboard", desc: "View real-time stats and threat analytics", link: "/dashboard" },
+  { icon: Users, title: "Community Reports", desc: "Spam numbers reported by the community", link: "/reports" },
 ];
 
 export default function HomePage() {
@@ -30,16 +30,16 @@ export default function HomePage() {
               Smart Cyber Security System
             </p>
             <p className="text-muted-foreground max-w-xl mx-auto mb-10">
-              Spam calls, fraud SMS और cyber threats से बचाव – AI और real-time analysis के साथ
+              Protection from spam calls, fraud SMS & cyber threats – powered by AI & real-time analysis
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button asChild size="lg" className="bg-primary text-primary-foreground hover:bg-primary/90 glow-cyan-sm font-semibold">
                 <Link to="/dashboard">
-                  Dashboard देखें <ArrowRight className="ml-2 h-4 w-4" />
+                  View Dashboard <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
               </Button>
               <Button asChild variant="outline" size="lg" className="border-border text-foreground hover:bg-secondary">
-                <Link to="/about">कैसे काम करता है?</Link>
+                <Link to="/about">How It Works?</Link>
               </Button>
             </div>
           </motion.div>
@@ -50,7 +50,7 @@ export default function HomePage() {
       <section className="py-20 border-t border-border">
         <div className="container mx-auto px-4">
           <h2 className="text-2xl md:text-3xl font-bold text-center mb-12 text-foreground">
-            मुख्य Features
+            Key Features
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {features.map((f, i) => (
@@ -78,9 +78,9 @@ export default function HomePage() {
       <section className="py-20 border-t border-border">
         <div className="container mx-auto px-4 text-center">
           <Lock className="h-10 w-10 text-primary mx-auto mb-4" />
-          <h2 className="text-2xl font-bold text-foreground mb-3">आपका Data सुरक्षित है</h2>
+          <h2 className="text-2xl font-bold text-foreground mb-3">Your Data is Secure</h2>
           <p className="text-muted-foreground max-w-md mx-auto">
-            सभी analysis local device पर होता है। कोई personal data cloud पर नहीं जाता।
+            All analysis runs locally on your device. No personal data is sent to the cloud.
           </p>
         </div>
       </section>
