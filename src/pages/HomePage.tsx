@@ -30,7 +30,7 @@ export default function HomePage() {
               Smart Cyber Security System
             </p>
             <p className="text-muted-foreground max-w-xl mx-auto mb-10">
-              Spam calls, fraud SMS और cyber threats से बचाव – AI और real-time analysis के साथ
+              Protection from spam calls, fraud SMS & cyber threats – powered by AI & real-time analysis
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button asChild size="lg" className="bg-primary text-primary-foreground hover:bg-primary/90 glow-cyan-sm font-semibold">
