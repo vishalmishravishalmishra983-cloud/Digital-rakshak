@@ -9,6 +9,7 @@ const navItems = [
   { path: "/number-checker", label: "Number Checker" },
   { path: "/sms-analyzer", label: "SMS Analyzer" },
   { path: "/call-simulator", label: "Call & Block" },
+  { path: "/link-checker", label: "Link Checker" },
   { path: "/reports", label: "Reports" },
   { path: "/about", label: "About" },
   { path: "/login", label: "Login" },
