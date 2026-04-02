@@ -4,10 +4,10 @@ import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 
 const features = [
-  { icon: Phone, title: "Number Checker", desc: "किसी भी नंबर को चेक करें – Spam है या Safe", link: "/number-checker" },
-  { icon: MessageSquare, title: "SMS Analyzer", desc: "SMS को AI से analyze करें और fraud detect करें", link: "/sms-analyzer" },
-  { icon: BarChart3, title: "Dashboard", desc: "Real-time stats और threats देखें", link: "/dashboard" },
-  { icon: Users, title: "Community Reports", desc: "लोगों द्वारा report किए गए spam numbers", link: "/reports" },
+  { icon: Phone, title: "Number Checker", desc: "Check any number instantly – Spam or Safe", link: "/number-checker" },
+  { icon: MessageSquare, title: "SMS Analyzer", desc: "Analyze SMS with AI and detect fraud messages", link: "/sms-analyzer" },
+  { icon: BarChart3, title: "Dashboard", desc: "View real-time stats and threat analytics", link: "/dashboard" },
+  { icon: Users, title: "Community Reports", desc: "Spam numbers reported by the community", link: "/reports" },
 ];
 
 export default function HomePage() {
