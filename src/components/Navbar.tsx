@@ -10,6 +10,7 @@ const navItems = [
   { path: "/sms-analyzer", label: "SMS Analyzer" },
   { path: "/call-simulator", label: "Call & Block" },
   { path: "/link-checker", label: "Link Checker" },
+  { path: "/family-link", label: "Family Link" },
   { path: "/reports", label: "Reports" },
   { path: "/about", label: "About" },
   { path: "/login", label: "Login" },
