@@ -94,7 +94,7 @@ const linkQuizzes = [
 
 // ─── Types ───────────────────────────────────────────────────────
 
-type Mode = "calls" | "sms" | "links";
+type Mode = "video" | "calls" | "sms" | "links";
 
 interface QuizState {
   current: number;
