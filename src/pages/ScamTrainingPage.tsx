@@ -109,8 +109,8 @@ const initialQuiz: QuizState = { current: 0, score: 0, answered: false, userAnsw
 // ─── Component ───────────────────────────────────────────────────
 
 export default function ScamTrainingPage() {
-  const [mode, setMode] = useState<Mode>("calls");
-  const [quiz, setQuiz] = useState<Record<Mode, QuizState>>({
+  const [mode, setMode] = useState<Mode>("video");
+  const [quiz, setQuiz] = useState<Record<"calls" | "sms" | "links", QuizState>>({
     calls: { ...initialQuiz },
     sms: { ...initialQuiz },
     links: { ...initialQuiz },
