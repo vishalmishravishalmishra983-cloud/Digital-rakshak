@@ -81,7 +81,7 @@ export default function CallSimulatorPage() {
   const handleCall = useCallback(() => {
     const trimmed = number.trim();
     if (!trimmed) {
-      toast("❌ नंबर डालें!", { description: "कृपया एक phone number enter करें।" });
+      toast("❌ Enter a number!", { description: "Please enter a phone number to call." });
       return;
     }
 
@@ -92,7 +92,7 @@ export default function CallSimulatorPage() {
     if (blockedNumbers.includes(trimmed)) {
       setCallState("blocked");
       setNumberStatus(null);
-      toast("🚫 यह नंबर Block है!", { description: `${trimmed} को आपने block किया है।` });
+      toast("🚫 Number is Blocked!", { description: `${trimmed} has been blocked by you.` });
       return;
     }
 
