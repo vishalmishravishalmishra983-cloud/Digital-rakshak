@@ -3,7 +3,7 @@ import { Phone, PhoneOff, ShieldX, ShieldCheck, AlertTriangle, Ban, PhoneCall, V
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { spamNumbers } from "@/lib/spamData";
+import { spamNumbers, detectNumberThreat } from "@/lib/spamData";
 import { toast } from "@/components/ui/sonner";
 
 const fraudAnnouncements = [
