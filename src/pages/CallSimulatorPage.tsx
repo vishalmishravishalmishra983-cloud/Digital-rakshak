@@ -3,7 +3,7 @@ import { Phone, PhoneOff, ShieldX, ShieldCheck, AlertTriangle, Ban, PhoneCall, V
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { spamNumbers } from "@/lib/spamData";
+import { spamNumbers, detectNumberThreat } from "@/lib/spamData";
 import { toast } from "@/components/ui/sonner";
 
 const fraudAnnouncements = [
@@ -81,7 +81,7 @@ export default function CallSimulatorPage() {
   const handleCall = useCallback(() => {
     const trimmed = number.trim();
     if (!trimmed) {
-      toast("❌ नंबर डालें!", { description: "कृपया एक phone number enter करें।" });
+      toast("❌ Enter a number!", { description: "Please enter a phone number to call." });
       return;
     }
 
@@ -92,12 +92,17 @@ export default function CallSimulatorPage() {
     if (blockedNumbers.includes(trimmed)) {
       setCallState("blocked");
       setNumberStatus(null);
-      toast("🚫 यह नंबर Block है!", { description: `${trimmed} को आपने block किया है।` });
+      toast("🚫 Number is Blocked!", { description: `${trimmed} has been blocked by you.` });
       return;
     }
 
+    // Check spam database first
     const found = spamNumbers[trimmed];
-    const status: NumberStatus = found?.status ?? "safe";
+    // Then check for company/prefix threats
+    const threat = detectNumberThreat(trimmed);
+    
+    const status: NumberStatus = found?.status ?? (threat?.isSpam ? "spam" : "safe");
+    const threatType = found?.type || threat?.type || "Unknown";
     setNumberStatus(status);
     setCallState("dialing");
     setCallDuration(0);
@@ -106,10 +111,20 @@ export default function CallSimulatorPage() {
       if (status === "spam") {
         setCallState("ended");
         setBlockedNumbers((prev) => (prev.includes(trimmed) ? prev : [...prev, trimmed]));
+        const reason = threat?.reason ? `\n${threat.reason}` : "";
         toast("⚠️ Fraud Number Detected!", {
-          description: `${trimmed} एक ${found?.type || "Spam"} number है। Call auto-block हो गया।`,
+          description: `${trimmed} is a ${threatType} number. Call auto-blocked!${reason}`,
         });
         speakFraudWarning((idx) => setSpeakingIndex(idx));
+      } else if (status === "suspicious") {
+        setCallState("ringing");
+        toast("⚠️ Suspicious Number!", {
+          description: `${trimmed} has been reported as suspicious. Be careful!`,
+        });
+        addTimer(window.setTimeout(() => {
+          setCallState("connected");
+          addTimer(window.setInterval(() => setCallDuration((d) => d + 1), 1000));
+        }, 1500));
       } else {
         setCallState("ringing");
         addTimer(window.setTimeout(() => {
@@ -130,13 +145,13 @@ export default function CallSimulatorPage() {
     if (!trimmed) return;
     if (!blockedNumbers.includes(trimmed)) {
       setBlockedNumbers((prev) => [...prev, trimmed]);
-      toast("🚫 Number Blocked!", { description: `${trimmed} को block कर दिया गया है।` });
+      toast("🚫 Number Blocked!", { description: `${trimmed} has been blocked successfully.` });
     }
   }, [number, blockedNumbers]);
 
   const handleUnblock = useCallback((num: string) => {
     setBlockedNumbers((prev) => prev.filter((n) => n !== num));
-    toast("✅ Number Unblocked", { description: `${num} को unblock कर दिया गया।` });
+    toast("✅ Number Unblocked", { description: `${num} has been unblocked.` });
   }, []);
 
   const handleNewCall = useCallback(() => {
@@ -164,12 +179,12 @@ export default function CallSimulatorPage() {
       <div className="container mx-auto px-4 max-w-2xl">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
           <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-2">📞 Call Simulator & Blocker</h1>
-          <p className="text-muted-foreground mb-8">नंबर डालें, कॉल करें – Fraud नंबर auto-block होगा!</p>
+          <p className="text-muted-foreground mb-8">Enter a number, make a call – Fraud numbers get auto-blocked!</p>
 
           <div className="rounded-lg border border-border p-6 gradient-card mb-6">
             <div className="flex gap-3 mb-4">
               <Input
-                placeholder="Phone number डालें (e.g. 8888888888)"
+                placeholder="Enter phone number (e.g. +9111xxxx, 011xxxx, 140xxx)"
                 value={number}
                 onChange={(e) => setNumber(e.target.value)}
                 onKeyDown={(e) => {
@@ -202,7 +217,7 @@ export default function CallSimulatorPage() {
                 <motion.div key="dialing" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="mt-6 text-center">
                   <Phone className="h-12 w-12 text-primary mx-auto animate-pulse" />
                   <p className="text-muted-foreground mt-2">Dialing {number}...</p>
-                  <p className="text-xs text-muted-foreground mt-1">AI Database check हो रहा है...</p>
+                  <p className="text-xs text-muted-foreground mt-1">Checking AI Database...</p>
                 </motion.div>
               )}
 
@@ -218,9 +233,9 @@ export default function CallSimulatorPage() {
                   className="mt-6 rounded-lg border p-6 bg-destructive/20 border-destructive text-center">
                   <Ban className="h-10 w-10 mx-auto mb-2 text-destructive" />
                   <h3 className="text-lg font-bold">🚫 Number Blocked!</h3>
-                  <p className="text-sm text-muted-foreground mt-1">{number.trim()} पहले से block है।</p>
+                  <p className="text-sm text-muted-foreground mt-1">{number.trim()} is already blocked.</p>
                   <Button size="sm" variant="outline" className="mt-3" onClick={handleNewCall}>
-                    नया नंबर डालें
+                    Try another number
                   </Button>
                 </motion.div>
               )}
@@ -311,7 +326,7 @@ export default function CallSimulatorPage() {
           )}
 
           <p className="text-xs text-muted-foreground mt-4 text-center">
-            Demo spam numbers: 8888888888, 7777777777, 9876543210 | Safe: 1234567890
+            Demo: 8888888888, +911112345678, 01112345678, 14012345 | Safe: 1234567890
           </p>
         </motion.div>
       </div>

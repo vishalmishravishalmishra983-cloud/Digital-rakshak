@@ -8,6 +8,58 @@ export const spamNumbers: Record<string, { status: "spam" | "suspicious" | "safe
   "1234567890": { status: "safe", reports: 0, type: "Verified Business" },
 };
 
+// Company spam caller names
+export const companySpamNames: Record<string, string> = {
+  "credit card": "Credit Card Scam",
+  "loan offer": "Loan Fraud",
+  "insurance": "Insurance Scam",
+  "investment": "Investment Fraud",
+  "trading": "Trading Scam",
+  "lottery": "Lottery Fraud",
+  "prize": "Prize Scam",
+  "amazon": "Fake Amazon Call",
+  "flipkart": "Fake Flipkart Call",
+  "paytm": "Fake Paytm Call",
+  "bank": "Bank Fraud",
+  "sbi": "Fake SBI Call",
+  "rbi": "Fake RBI Call",
+  "customs": "Customs Fraud",
+  "police": "Fake Police Call",
+  "court": "Fake Court Notice",
+  "emi": "EMI Scam",
+  "kyc": "KYC Fraud",
+};
+
+// Detect if number looks like a company/spam prefix
+export function detectNumberThreat(input: string): { isSpam: boolean; reason: string; type: string } | null {
+  const trimmed = input.trim().toLowerCase();
+  
+  // Check if input contains company spam keywords
+  for (const [keyword, type] of Object.entries(companySpamNames)) {
+    if (trimmed.includes(keyword)) {
+      return { isSpam: true, reason: `Company spam detected: "${keyword}"`, type };
+    }
+  }
+  
+  // +91 11 prefix (Delhi landline - commonly spoofed)
+  const cleaned = trimmed.replace(/[\s\-\(\)]/g, "");
+  if (cleaned.startsWith("+9111") || cleaned.startsWith("009111") || cleaned.startsWith("011")) {
+    return { isSpam: true, reason: "+91-11 prefix (Delhi landline - commonly spoofed)", type: "Suspicious Landline" };
+  }
+  
+  // Generic +91 with short/unusual patterns
+  if ((cleaned.startsWith("+91") || cleaned.startsWith("0091")) && cleaned.replace(/\D/g, "").length < 12) {
+    return { isSpam: true, reason: "Invalid +91 number format", type: "Spoofed Number" };
+  }
+  
+  // Numbers starting with company-like prefixes (1800, 140, etc.)
+  if (cleaned.startsWith("140") || cleaned.startsWith("1800")) {
+    return { isSpam: true, reason: "Automated/Company caller prefix", type: "Telemarketer" };
+  }
+  
+  return null;
+}
+
 export const fraudKeywords = [
   "otp", "bank", "lottery", "prize", "winner", "click here", "urgent",
   "account blocked", "verify", "kyc", "link", "expiry", "suspend",
