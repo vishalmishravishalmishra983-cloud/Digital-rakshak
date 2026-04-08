@@ -117,8 +117,11 @@ export default function ScamTrainingPage() {
   });
 
   const data = { calls: callScenarios, sms: smsQuizzes, links: linkQuizzes };
-  const q = quiz[mode];
-  const items = data[mode];
+  
+  // For video mode, skip quiz logic
+  const quizMode = mode === "video" ? "calls" : mode;
+  const q = quiz[quizMode];
+  const items = data[quizMode];
   const item = items[q.current];
 
   const handleAnswer = useCallback((answer: boolean) => {
