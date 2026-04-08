@@ -96,8 +96,13 @@ export default function CallSimulatorPage() {
       return;
     }
 
+    // Check spam database first
     const found = spamNumbers[trimmed];
-    const status: NumberStatus = found?.status ?? "safe";
+    // Then check for company/prefix threats
+    const threat = detectNumberThreat(trimmed);
+    
+    const status: NumberStatus = found?.status ?? (threat?.isSpam ? "spam" : "safe");
+    const threatType = found?.type || threat?.type || "Unknown";
     setNumberStatus(status);
     setCallState("dialing");
     setCallDuration(0);
@@ -106,10 +111,20 @@ export default function CallSimulatorPage() {
       if (status === "spam") {
         setCallState("ended");
         setBlockedNumbers((prev) => (prev.includes(trimmed) ? prev : [...prev, trimmed]));
+        const reason = threat?.reason ? `\n${threat.reason}` : "";
         toast("⚠️ Fraud Number Detected!", {
-          description: `${trimmed} एक ${found?.type || "Spam"} number है। Call auto-block हो गया।`,
+          description: `${trimmed} is a ${threatType} number. Call auto-blocked!${reason}`,
         });
         speakFraudWarning((idx) => setSpeakingIndex(idx));
+      } else if (status === "suspicious") {
+        setCallState("ringing");
+        toast("⚠️ Suspicious Number!", {
+          description: `${trimmed} has been reported as suspicious. Be careful!`,
+        });
+        addTimer(window.setTimeout(() => {
+          setCallState("connected");
+          addTimer(window.setInterval(() => setCallDuration((d) => d + 1), 1000));
+        }, 1500));
       } else {
         setCallState("ringing");
         addTimer(window.setTimeout(() => {
