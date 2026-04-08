@@ -125,6 +125,7 @@ export default function ScamTrainingPage() {
   const item = items[q.current];
 
   const handleAnswer = useCallback((answer: boolean) => {
+    if (mode === "video") return;
     const isCorrect = answer === (item as any).isScam;
     setQuiz((prev) => ({
       ...prev,
@@ -138,6 +139,7 @@ export default function ScamTrainingPage() {
   }, [mode, item]);
 
   const handleNext = useCallback(() => {
+    if (mode === "video") return;
     setQuiz((prev) => {
       const next = prev[mode].current + 1;
       if (next >= items.length) {
@@ -148,6 +150,7 @@ export default function ScamTrainingPage() {
   }, [mode, items.length]);
 
   const handleRestart = useCallback(() => {
+    if (mode === "video") return;
     setQuiz((prev) => ({ ...prev, [mode]: { ...initialQuiz } }));
   }, [mode]);
 
