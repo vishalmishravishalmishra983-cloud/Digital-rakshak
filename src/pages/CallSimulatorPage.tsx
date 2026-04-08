@@ -233,9 +233,9 @@ export default function CallSimulatorPage() {
                   className="mt-6 rounded-lg border p-6 bg-destructive/20 border-destructive text-center">
                   <Ban className="h-10 w-10 mx-auto mb-2 text-destructive" />
                   <h3 className="text-lg font-bold">🚫 Number Blocked!</h3>
-                  <p className="text-sm text-muted-foreground mt-1">{number.trim()} पहले से block है।</p>
+                  <p className="text-sm text-muted-foreground mt-1">{number.trim()} is already blocked.</p>
                   <Button size="sm" variant="outline" className="mt-3" onClick={handleNewCall}>
-                    नया नंबर डालें
+                    Try another number
                   </Button>
                 </motion.div>
               )}
