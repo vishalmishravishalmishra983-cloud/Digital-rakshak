@@ -1,5 +1,5 @@
 import { useState, useCallback } from "react";
-import { GraduationCap, Phone, MessageSquare, Link2, CheckCircle2, XCircle, Trophy, RotateCcw, ArrowRight } from "lucide-react";
+import { GraduationCap, Phone, MessageSquare, Link2, CheckCircle2, XCircle, Trophy, RotateCcw, ArrowRight, PlayCircle } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -94,7 +94,7 @@ const linkQuizzes = [
 
 // ─── Types ───────────────────────────────────────────────────────
 
-type Mode = "calls" | "sms" | "links";
+type Mode = "video" | "calls" | "sms" | "links";
 
 interface QuizState {
   current: number;
@@ -109,19 +109,23 @@ const initialQuiz: QuizState = { current: 0, score: 0, answered: false, userAnsw
 // ─── Component ───────────────────────────────────────────────────
 
 export default function ScamTrainingPage() {
-  const [mode, setMode] = useState<Mode>("calls");
-  const [quiz, setQuiz] = useState<Record<Mode, QuizState>>({
+  const [mode, setMode] = useState<Mode>("video");
+  const [quiz, setQuiz] = useState<Record<"calls" | "sms" | "links", QuizState>>({
     calls: { ...initialQuiz },
     sms: { ...initialQuiz },
     links: { ...initialQuiz },
   });
 
   const data = { calls: callScenarios, sms: smsQuizzes, links: linkQuizzes };
-  const q = quiz[mode];
-  const items = data[mode];
+  
+  // For video mode, skip quiz logic
+  const quizMode = mode === "video" ? "calls" : mode;
+  const q = quiz[quizMode];
+  const items = data[quizMode];
   const item = items[q.current];
 
   const handleAnswer = useCallback((answer: boolean) => {
+    if (mode === "video") return;
     const isCorrect = answer === (item as any).isScam;
     setQuiz((prev) => ({
       ...prev,
@@ -135,6 +139,7 @@ export default function ScamTrainingPage() {
   }, [mode, item]);
 
   const handleNext = useCallback(() => {
+    if (mode === "video") return;
     setQuiz((prev) => {
       const next = prev[mode].current + 1;
       if (next >= items.length) {
@@ -145,6 +150,7 @@ export default function ScamTrainingPage() {
   }, [mode, items.length]);
 
   const handleRestart = useCallback(() => {
+    if (mode === "video") return;
     setQuiz((prev) => ({ ...prev, [mode]: { ...initialQuiz } }));
   }, [mode]);
 
@@ -170,7 +176,10 @@ export default function ScamTrainingPage() {
           <p className="text-muted-foreground mb-6">Learn to identify scams through interactive quizzes. Test your skills!</p>
 
           <Tabs value={mode} onValueChange={(v) => setMode(v as Mode)}>
-            <TabsList className="grid w-full grid-cols-3 mb-6">
+            <TabsList className="grid w-full grid-cols-4 mb-6">
+              <TabsTrigger value="video" className="gap-1.5">
+                <PlayCircle className="h-4 w-4" /> Video
+              </TabsTrigger>
               <TabsTrigger value="calls" className="gap-1.5">
                 <Phone className="h-4 w-4" /> Calls
               </TabsTrigger>
@@ -181,6 +190,34 @@ export default function ScamTrainingPage() {
                 <Link2 className="h-4 w-4" /> Links
               </TabsTrigger>
             </TabsList>
+
+            <TabsContent value="video">
+              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
+                <Card className="p-5 border-border gradient-card">
+                  <div className="flex items-center gap-2 mb-4">
+                    <PlayCircle className="h-5 w-5 text-primary" />
+                    <h3 className="font-semibold text-foreground">Scam Awareness Training Video</h3>
+                  </div>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    Watch this short guide to learn how to identify call scams, SMS phishing, and fake links.
+                  </p>
+                  <div className="rounded-lg overflow-hidden border border-border bg-secondary">
+                    <video
+                      src="/scam-training-video.mp4"
+                      controls
+                      className="w-full"
+                      poster=""
+                      style={{ maxHeight: 500 }}
+                    >
+                      Your browser does not support the video tag.
+                    </video>
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-3 text-center">
+                    After watching, try the interactive quizzes in the Calls, SMS & Links tabs!
+                  </p>
+                </Card>
+              </motion.div>
+            </TabsContent>
 
             {["calls", "sms", "links"].map((m) => (
               <TabsContent key={m} value={m}>
