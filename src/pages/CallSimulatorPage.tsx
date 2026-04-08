@@ -145,7 +145,7 @@ export default function CallSimulatorPage() {
     if (!trimmed) return;
     if (!blockedNumbers.includes(trimmed)) {
       setBlockedNumbers((prev) => [...prev, trimmed]);
-      toast("🚫 Number Blocked!", { description: `${trimmed} को block कर दिया गया है।` });
+      toast("🚫 Number Blocked!", { description: `${trimmed} has been blocked successfully.` });
     }
   }, [number, blockedNumbers]);
 
