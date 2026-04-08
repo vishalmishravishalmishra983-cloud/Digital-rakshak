@@ -12,6 +12,7 @@ import AboutPage from "./pages/AboutPage";
 import CallSimulatorPage from "./pages/CallSimulatorPage";
 import LinkCheckerPage from "./pages/LinkCheckerPage";
 import FamilyLinkPage from "./pages/FamilyLinkPage";
+import ScamTrainingPage from "./pages/ScamTrainingPage";
 import LoginPage from "./pages/LoginPage";
 import NotFound from "./pages/NotFound";
 
