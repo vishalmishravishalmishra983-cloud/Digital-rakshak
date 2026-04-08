@@ -151,7 +151,7 @@ export default function CallSimulatorPage() {
 
   const handleUnblock = useCallback((num: string) => {
     setBlockedNumbers((prev) => prev.filter((n) => n !== num));
-    toast("✅ Number Unblocked", { description: `${num} को unblock कर दिया गया।` });
+    toast("✅ Number Unblocked", { description: `${num} has been unblocked.` });
   }, []);
 
   const handleNewCall = useCallback(() => {
