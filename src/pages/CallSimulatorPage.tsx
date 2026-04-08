@@ -326,7 +326,7 @@ export default function CallSimulatorPage() {
           )}
 
           <p className="text-xs text-muted-foreground mt-4 text-center">
-            Demo spam numbers: 8888888888, 7777777777, 9876543210 | Safe: 1234567890
+            Demo: 8888888888, +911112345678, 01112345678, 14012345 | Safe: 1234567890
           </p>
         </motion.div>
       </div>
