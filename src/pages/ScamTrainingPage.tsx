@@ -1,5 +1,5 @@
 import { useState, useCallback } from "react";
-import { GraduationCap, Phone, MessageSquare, Link2, CheckCircle2, XCircle, Trophy, RotateCcw, ArrowRight } from "lucide-react";
+import { GraduationCap, Phone, MessageSquare, Link2, CheckCircle2, XCircle, Trophy, RotateCcw, ArrowRight, PlayCircle } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
