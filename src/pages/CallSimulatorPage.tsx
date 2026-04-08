@@ -217,7 +217,7 @@ export default function CallSimulatorPage() {
                 <motion.div key="dialing" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="mt-6 text-center">
                   <Phone className="h-12 w-12 text-primary mx-auto animate-pulse" />
                   <p className="text-muted-foreground mt-2">Dialing {number}...</p>
-                  <p className="text-xs text-muted-foreground mt-1">AI Database check हो रहा है...</p>
+                  <p className="text-xs text-muted-foreground mt-1">Checking AI Database...</p>
                 </motion.div>
               )}
 
