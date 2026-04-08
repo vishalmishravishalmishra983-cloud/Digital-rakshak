@@ -179,7 +179,7 @@ export default function CallSimulatorPage() {
       <div className="container mx-auto px-4 max-w-2xl">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
           <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-2">📞 Call Simulator & Blocker</h1>
-          <p className="text-muted-foreground mb-8">नंबर डालें, कॉल करें – Fraud नंबर auto-block होगा!</p>
+          <p className="text-muted-foreground mb-8">Enter a number, make a call – Fraud numbers get auto-blocked!</p>
 
           <div className="rounded-lg border border-border p-6 gradient-card mb-6">
             <div className="flex gap-3 mb-4">
