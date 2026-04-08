@@ -184,7 +184,7 @@ export default function CallSimulatorPage() {
           <div className="rounded-lg border border-border p-6 gradient-card mb-6">
             <div className="flex gap-3 mb-4">
               <Input
-                placeholder="Phone number डालें (e.g. 8888888888)"
+                placeholder="Enter phone number (e.g. +9111xxxx, 011xxxx, 140xxx)"
                 value={number}
                 onChange={(e) => setNumber(e.target.value)}
                 onKeyDown={(e) => {
