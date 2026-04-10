@@ -368,7 +368,7 @@ function VideoTrainingSection({ labels }: { labels: ReturnType<typeof getTrainin
       return saved ? JSON.parse(saved) : [];
     } catch { return []; }
   });
-  const [activeVideo, setActiveVideo] = useState<string>("/scam-training-video.mp4");
+  const [activeVideo, setActiveVideo] = useState<string>("");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -389,7 +389,7 @@ function VideoTrainingSection({ labels }: { labels: ReturnType<typeof getTrainin
   const handleRemove = (idx: number) => {
     setUploadedVideos((prev) => {
       const removed = prev[idx];
-      if (activeVideo === removed.url) setActiveVideo("/scam-training-video.mp4");
+      if (activeVideo === removed.url) setActiveVideo("");
       URL.revokeObjectURL(removed.url);
       return prev.filter((_, i) => i !== idx);
     });
@@ -404,11 +404,21 @@ function VideoTrainingSection({ labels }: { labels: ReturnType<typeof getTrainin
           <h3 className="font-semibold text-foreground">{labels.videoTitle}</h3>
         </div>
         <p className="text-sm text-muted-foreground mb-4">{labels.videoSubtitle}</p>
-        <div className="rounded-lg overflow-hidden border border-border bg-secondary">
-          <video key={activeVideo} src={activeVideo} controls className="w-full" style={{ maxHeight: 500 }}>
-            Your browser does not support the video tag.
-          </video>
-        </div>
+        {activeVideo ? (
+          <div className="rounded-lg overflow-hidden border border-border bg-secondary">
+            <video key={activeVideo} src={activeVideo} controls className="w-full" style={{ maxHeight: 500 }}>
+              Your browser does not support the video tag.
+            </video>
+          </div>
+        ) : (
+          <div className="rounded-lg border border-dashed border-border bg-secondary/50 flex flex-col items-center justify-center py-16 gap-3">
+            <Upload className="h-10 w-10 text-muted-foreground" />
+            <p className="text-sm text-muted-foreground">Upload a video to start training</p>
+            <Button size="sm" variant="outline" onClick={() => fileInputRef.current?.click()}>
+              <Upload className="h-4 w-4 mr-1" /> Choose File
+            </Button>
+          </div>
+        )}
         <p className="text-xs text-muted-foreground mt-3 text-center">{labels.videoAfter}</p>
       </Card>
 
@@ -430,19 +440,6 @@ function VideoTrainingSection({ labels }: { labels: ReturnType<typeof getTrainin
 
         {/* Video List */}
         <div className="space-y-2">
-          {/* Default video */}
-          <button
-            onClick={() => setActiveVideo("/scam-training-video.mp4")}
-            className={`w-full flex items-center gap-3 p-3 rounded-md border text-left transition-colors ${
-              activeVideo === "/scam-training-video.mp4"
-                ? "border-primary bg-primary/10"
-                : "border-border hover:bg-secondary/50"
-            }`}
-          >
-            <Film className="h-4 w-4 text-primary shrink-0" />
-            <span className="text-sm text-foreground truncate flex-1">Default Training Video</span>
-            <Badge variant="secondary" className="text-[10px]">Built-in</Badge>
-          </button>
 
           {/* Uploaded videos */}
           {uploadedVideos.map((v, i) => (
