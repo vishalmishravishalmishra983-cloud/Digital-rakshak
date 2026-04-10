@@ -58,13 +58,14 @@ export default function ScamTrainingPage() {
   useEffect(() => () => stopSpeaking(), []);
 
   const handleSpeak = useCallback((text: string) => {
+    // Create utterance immediately in gesture context (critical for app/PWA)
+    const utterance = createUtteranceInGesture(lang);
     if (isSpeakingNow) {
       stopSpeaking();
       setIsSpeakingNow(false);
     } else {
-      speakText(text, lang);
+      speakText(text, lang, utterance);
       setIsSpeakingNow(true);
-      // Reset after speech ends
       const check = setInterval(() => {
         if (!window.speechSynthesis.speaking) {
           setIsSpeakingNow(false);
@@ -76,6 +77,8 @@ export default function ScamTrainingPage() {
 
   const handleAnswer = useCallback((answer: boolean) => {
     if (mode === "video") return;
+    // Create utterance immediately in gesture context (critical for app/PWA)
+    const utterance = createUtteranceInGesture(lang);
     const isCorrect = answer === (item as any).isScam;
     setQuiz((prev) => ({
       ...prev,
@@ -88,7 +91,7 @@ export default function ScamTrainingPage() {
     }));
     // Voice feedback
     const feedbackText = isCorrect ? labels.correct : labels.wrong;
-    speakText(feedbackText + " " + (item as any).explanation, lang);
+    speakText(feedbackText + " " + (item as any).explanation, lang, utterance);
     setIsSpeakingNow(true);
     const check = setInterval(() => {
       if (!window.speechSynthesis.speaking) {
