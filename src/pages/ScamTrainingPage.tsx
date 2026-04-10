@@ -1,5 +1,5 @@
-import { useState, useCallback, useEffect } from "react";
-import { GraduationCap, Phone, MessageSquare, Link2, CheckCircle2, XCircle, Trophy, RotateCcw, ArrowRight, PlayCircle, Volume2, VolumeX, Globe } from "lucide-react";
+import { useState, useCallback, useEffect, useRef } from "react";
+import { GraduationCap, Phone, MessageSquare, Link2, CheckCircle2, XCircle, Trophy, RotateCcw, ArrowRight, PlayCircle, Volume2, VolumeX, Globe, Upload, X, Film } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -171,19 +171,7 @@ export default function ScamTrainingPage() {
 
             <TabsContent value="video">
               <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-                <Card className="p-5 border-border gradient-card">
-                  <div className="flex items-center gap-2 mb-4">
-                    <PlayCircle className="h-5 w-5 text-primary" />
-                    <h3 className="font-semibold text-foreground">{labels.videoTitle}</h3>
-                  </div>
-                  <p className="text-sm text-muted-foreground mb-4">{labels.videoSubtitle}</p>
-                  <div className="rounded-lg overflow-hidden border border-border bg-secondary">
-                    <video src="/scam-training-video.mp4" controls className="w-full" style={{ maxHeight: 500 }}>
-                      Your browser does not support the video tag.
-                    </video>
-                  </div>
-                  <p className="text-xs text-muted-foreground mt-3 text-center">{labels.videoAfter}</p>
-                </Card>
+                <VideoTrainingSection labels={labels} />
               </motion.div>
             </TabsContent>
 
