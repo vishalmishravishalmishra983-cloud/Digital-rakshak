@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { getTrainingData, supportedLanguages, type LangCode } from "@/lib/trainingData";
-import { speakText, stopSpeaking } from "@/lib/voiceHelper";
+import { speakText, stopSpeaking, createUtteranceInGesture } from "@/lib/voiceHelper";
 
 type Mode = "video" | "calls" | "sms" | "links";
 
