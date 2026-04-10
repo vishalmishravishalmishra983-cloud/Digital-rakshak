@@ -1,5 +1,5 @@
-import { useState, useCallback, useEffect } from "react";
-import { GraduationCap, Phone, MessageSquare, Link2, CheckCircle2, XCircle, Trophy, RotateCcw, ArrowRight, PlayCircle, Volume2, VolumeX, Globe } from "lucide-react";
+import { useState, useCallback, useEffect, useRef } from "react";
+import { GraduationCap, Phone, MessageSquare, Link2, CheckCircle2, XCircle, Trophy, RotateCcw, ArrowRight, PlayCircle, Volume2, VolumeX, Globe, Upload, X, Film } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -171,19 +171,7 @@ export default function ScamTrainingPage() {
 
             <TabsContent value="video">
               <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-                <Card className="p-5 border-border gradient-card">
-                  <div className="flex items-center gap-2 mb-4">
-                    <PlayCircle className="h-5 w-5 text-primary" />
-                    <h3 className="font-semibold text-foreground">{labels.videoTitle}</h3>
-                  </div>
-                  <p className="text-sm text-muted-foreground mb-4">{labels.videoSubtitle}</p>
-                  <div className="rounded-lg overflow-hidden border border-border bg-secondary">
-                    <video src="/scam-training-video.mp4" controls className="w-full" style={{ maxHeight: 500 }}>
-                      Your browser does not support the video tag.
-                    </video>
-                  </div>
-                  <p className="text-xs text-muted-foreground mt-3 text-center">{labels.videoAfter}</p>
-                </Card>
+                <VideoTrainingSection labels={labels} />
               </motion.div>
             </TabsContent>
 
@@ -363,5 +351,120 @@ function ResultCard({ score, total, grade, onRestart, labels }: {
         </div>
       </Card>
     </motion.div>
+  );
+}
+
+// ─── Video Training with Upload ──────────────────────────────────
+
+interface UploadedVideo {
+  name: string;
+  url: string;
+}
+
+function VideoTrainingSection({ labels }: { labels: ReturnType<typeof getTrainingData>["labels"] }) {
+  const [uploadedVideos, setUploadedVideos] = useState<UploadedVideo[]>(() => {
+    try {
+      const saved = localStorage.getItem("training-videos");
+      return saved ? JSON.parse(saved) : [];
+    } catch { return []; }
+  });
+  const [activeVideo, setActiveVideo] = useState<string>("/scam-training-video.mp4");
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    localStorage.setItem("training-videos", JSON.stringify(uploadedVideos));
+  }, [uploadedVideos]);
+
+  const handleUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files) return;
+    Array.from(files).forEach((file) => {
+      if (!file.type.startsWith("video/")) return;
+      const url = URL.createObjectURL(file);
+      setUploadedVideos((prev) => [...prev, { name: file.name, url }]);
+    });
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  };
+
+  const handleRemove = (idx: number) => {
+    setUploadedVideos((prev) => {
+      const removed = prev[idx];
+      if (activeVideo === removed.url) setActiveVideo("/scam-training-video.mp4");
+      URL.revokeObjectURL(removed.url);
+      return prev.filter((_, i) => i !== idx);
+    });
+  };
+
+  return (
+    <div className="space-y-4">
+      {/* Main Video Player */}
+      <Card className="p-5 border-border gradient-card">
+        <div className="flex items-center gap-2 mb-4">
+          <PlayCircle className="h-5 w-5 text-primary" />
+          <h3 className="font-semibold text-foreground">{labels.videoTitle}</h3>
+        </div>
+        <p className="text-sm text-muted-foreground mb-4">{labels.videoSubtitle}</p>
+        <div className="rounded-lg overflow-hidden border border-border bg-secondary">
+          <video key={activeVideo} src={activeVideo} controls className="w-full" style={{ maxHeight: 500 }}>
+            Your browser does not support the video tag.
+          </video>
+        </div>
+        <p className="text-xs text-muted-foreground mt-3 text-center">{labels.videoAfter}</p>
+      </Card>
+
+      {/* Upload Section */}
+      <Card className="p-5 border-border gradient-card">
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center gap-2">
+            <Upload className="h-5 w-5 text-primary" />
+            <h3 className="font-semibold text-foreground">Upload Training Video</h3>
+          </div>
+          <Button size="sm" variant="outline" onClick={() => fileInputRef.current?.click()}>
+            <Upload className="h-4 w-4 mr-1" /> Choose File
+          </Button>
+          <input ref={fileInputRef} type="file" accept="video/*" multiple className="hidden" onChange={handleUpload} />
+        </div>
+        <p className="text-xs text-muted-foreground mb-3">
+          Upload your own scam awareness videos (MP4, WebM, etc.) to train yourself or your family.
+        </p>
+
+        {/* Video List */}
+        <div className="space-y-2">
+          {/* Default video */}
+          <button
+            onClick={() => setActiveVideo("/scam-training-video.mp4")}
+            className={`w-full flex items-center gap-3 p-3 rounded-md border text-left transition-colors ${
+              activeVideo === "/scam-training-video.mp4"
+                ? "border-primary bg-primary/10"
+                : "border-border hover:bg-secondary/50"
+            }`}
+          >
+            <Film className="h-4 w-4 text-primary shrink-0" />
+            <span className="text-sm text-foreground truncate flex-1">Default Training Video</span>
+            <Badge variant="secondary" className="text-[10px]">Built-in</Badge>
+          </button>
+
+          {/* Uploaded videos */}
+          {uploadedVideos.map((v, i) => (
+            <div
+              key={i}
+              className={`flex items-center gap-3 p-3 rounded-md border transition-colors ${
+                activeVideo === v.url
+                  ? "border-primary bg-primary/10"
+                  : "border-border hover:bg-secondary/50"
+              }`}
+            >
+              <button onClick={() => setActiveVideo(v.url)} className="flex items-center gap-3 flex-1 text-left min-w-0">
+                <Film className="h-4 w-4 text-primary shrink-0" />
+                <span className="text-sm text-foreground truncate">{v.name}</span>
+              </button>
+              <Button variant="ghost" size="icon" className="h-7 w-7 shrink-0" onClick={() => handleRemove(i)}>
+                <X className="h-3.5 w-3.5 text-muted-foreground" />
+              </Button>
+            </div>
+          ))}
+        </div>
+      </Card>
+    </div>
   );
 }
