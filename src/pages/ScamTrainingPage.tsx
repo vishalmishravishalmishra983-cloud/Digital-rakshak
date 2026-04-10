@@ -381,11 +381,15 @@ function VideoTrainingSection({ labels }: { labels: ReturnType<typeof getTrainin
   const handleUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files) return;
+    let lastUrl = "";
     Array.from(files).forEach((file) => {
       if (!file.type.startsWith("video/")) return;
       const url = URL.createObjectURL(file);
+      lastUrl = url;
       setUploadedVideos((prev) => [...prev, { name: file.name, url }]);
     });
+    // Auto-select the last uploaded video so it shows immediately
+    if (lastUrl) setActiveVideo(lastUrl);
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
